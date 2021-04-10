@@ -18,7 +18,6 @@ const postResolvers = {
     },
     getPost: async (parent, args, context, info) => {
       const { postId } = args
-
       try {
         const post = await Post.findById(postId)
         if (post) {
@@ -42,6 +41,26 @@ const postResolvers = {
       })
       const post = await newPost.save()
       return post
+    },
+    editPost: async (parent, args, context, info) => {
+      const user = checkAuth(context)
+      try {
+        const post = await Post.findById(args.postId)
+        if (user.username === post.username) {
+          post._id = post._id
+          post.body = args.body || post.body
+          post.username = post.username
+          post.createdAt = post.createdAt
+          post.comments = post.comments
+          post.likes = post.likes
+
+          const editedPost = await post.save()
+          return editedPost
+        }
+        throw new AuthenticationError('Action not allowed')
+      } catch (error) {
+        throw new Error(error)
+      }
     },
     deletePost: async (parent, args, context, info) => {
       const user = checkAuth(context)
