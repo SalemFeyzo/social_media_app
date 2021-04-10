@@ -1,11 +1,17 @@
+import { AuthenticationError } from 'apollo-server'
 import Post from '../../models/postModel.js'
+import checkAuth from '../../utils/checkAuth.js'
 
 const postResolvers = {
   Query: {
     getPosts: async () => {
       try {
-        const posts = await Post.find({})
-        return posts
+        const posts = await Post.find({}).sort({ createdAt: -1 })
+        if (posts) {
+          return posts
+        } else {
+          throw new Error('Posts empty')
+        }
       } catch (error) {
         throw new Error(error)
       }
@@ -20,6 +26,32 @@ const postResolvers = {
         } else {
           throw new Error('Post not found')
         }
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
+  },
+  Mutation: {
+    createPost: async (parent, args, context, info) => {
+      const user = checkAuth(context)
+      const newPost = new Post({
+        body: args.body,
+        username: user.username,
+        createdAt: new Date().toISOString(),
+        user: user.id,
+      })
+      const post = await newPost.save()
+      return post
+    },
+    deletePost: async (parent, args, context, info) => {
+      const user = checkAuth(context)
+      try {
+        const post = await Post.findById(args.postId)
+        if (user.username === post.username) {
+          await post.delete()
+          return 'Post deleted'
+        }
+        throw new AuthenticationError('Action not allowed')
       } catch (error) {
         throw new Error(error)
       }

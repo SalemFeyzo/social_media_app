@@ -23,7 +23,7 @@ const userResolvers = {
         errors.general = 'Wrong credentials'
         throw new UserInputError('Wrong credentials', { errors })
       }
-      const token = generateToken(user._id)
+      const token = generateToken(user._id, user.username)
       return {
         ...user._doc,
         id: user._id,

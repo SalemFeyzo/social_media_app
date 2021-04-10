@@ -1,4 +1,5 @@
 import postResolvers from './postResolvers.js'
+import commentresolvers from './commentResolvers.js'
 import userResolvers from './userResolvers.js'
 
 const resolvers = {
@@ -7,6 +8,8 @@ const resolvers = {
   },
   Mutation: {
     ...userResolvers.Mutation,
+    ...postResolvers.Mutation,
+    ...commentresolvers.Mutation,
   },
 }
 
