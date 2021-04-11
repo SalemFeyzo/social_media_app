@@ -42,6 +42,24 @@ const commentresolvers = {
         throw new UserInputError('Post not found')
       }
     },
+    editComment: async (parent, args, context, info) => {
+      const user = checkAuth(context)
+      const post = await Post.findById(args.postId)
+      if (post) {
+        const comment = post.comments.find((c) => c.id === args.commentId)
+        if (comment.username === user.username) {
+          comment.username = comment.username
+          comment.body = args.body || comment.body
+          comment.createdAt = comment.createdAt
+          await post.save()
+          return post
+        } else {
+          throw new AuthenticationError('Action not allowed')
+        }
+      } else {
+        throw new UserInputError('Post not found')
+      }
+    },
   },
 }
 
