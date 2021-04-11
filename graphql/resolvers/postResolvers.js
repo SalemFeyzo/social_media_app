@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server'
+import { AuthenticationError, UserInputError } from 'apollo-server'
 import Post from '../../models/postModel.js'
 import checkAuth from '../../utils/checkAuth.js'
 
@@ -33,6 +33,9 @@ const postResolvers = {
   Mutation: {
     createPost: async (parent, args, context, info) => {
       const user = checkAuth(context)
+      if (args.body.trim() === '') {
+        throw new UserInputError('Post must not be empty')
+      }
       const newPost = new Post({
         body: args.body,
         username: user.username,
