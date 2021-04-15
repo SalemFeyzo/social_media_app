@@ -6,7 +6,6 @@ import userResolvers from './userResolvers.js'
 const resolvers = {
   Post: {
     likesCount: (parent, args, context, info) => {
-      console.log(parent)
       return parent.likes.length
     },
     commentsCount: (parent, args, context, info) => {
